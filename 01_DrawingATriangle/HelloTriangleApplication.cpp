@@ -5,6 +5,7 @@
 #include <vector>
 #include <string.h>
 #include <algorithm>
+#include <functional>
 
 void HelloTriangleApplication::run()
 {
@@ -66,9 +67,10 @@ void HelloTriangleApplication::createInstance()
     // Checking if any of the required extensions are missing
     for (int i = 0; i < glfwExtensionCount; i++)
     {
-        auto lambda = [&i, &glfwExtensions](VkExtensionProperties& extension) { return strcmp(extension.extensionName, glfwExtensions[i]) == 0; };
+        std::function<bool(VkExtensionProperties&)> findExtension =
+            [&i, &glfwExtensions](VkExtensionProperties& extension) { return strcmp(extension.extensionName, glfwExtensions[i]) == 0; };
 
-        auto it = std::find_if(extensions.begin(), extensions.end(), lambda);
+        auto it = std::find_if(extensions.begin(), extensions.end(), findExtension);
 
         if (it == extensions.end())
         {

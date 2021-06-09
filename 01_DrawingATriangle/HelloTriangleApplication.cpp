@@ -65,17 +65,25 @@ void HelloTriangleApplication::createInstance()
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
     // Checking if any of the required extensions are missing
+    bool requiredExtensionsAvailable = true;
     for (int i = 0; i < glfwExtensionCount; i++)
     {
         std::function<bool(VkExtensionProperties&)> findExtension =
-            [&i, &glfwExtensions](VkExtensionProperties& extension) { return strcmp(extension.extensionName, glfwExtensions[i]) == 0; };
+            [&i, &glfwExtensions](const VkExtensionProperties& extension) { return strcmp(extension.extensionName, glfwExtensions[i]) == 0; };
 
         auto it = std::find_if(extensions.begin(), extensions.end(), findExtension);
 
         if (it == extensions.end())
         {
             std::cout << "Required extension not found: " << glfwExtensions[i] << std::endl;
+
+            requiredExtensionsAvailable = false;
         }
+    }
+
+    if (!requiredExtensionsAvailable)
+    {
+        throw std::runtime_error("Required extensions are missing!");
     }
 
     // Setting those global extensions to the Vulkan driver
